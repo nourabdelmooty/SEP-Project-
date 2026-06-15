@@ -216,3 +216,26 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# PyCharm
+.idea/
+
+# Virtual Environment
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# Dataset
+Dataset/classification_*_with_emotions.csv
+
+Dataset/*
+!Dataset/classification_sample_100k_with_emotions.csv
+!Dataset/film_level_dataset_full.csv
+!Dataset/film_level_dataset_reliable.csv
+
+# Dima's experiment files
+dima_git_ignore/
