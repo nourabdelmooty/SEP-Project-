@@ -7,12 +7,9 @@ from sklearn.cluster import MiniBatchKMeans
 import warnings
 warnings.filterwarnings('ignore')
 
-import os
-os.chdir('/Users/nourelrahman/PycharmProjects/SEP-Project-')
-
+merged = pd.read_csv('Dataset/merged_clean.csv')
 
 print("Loading full dataset...")
-merged = pd.read_csv('Dataset/merged_clean.csv')
 merged["main_genre"] = merged["genre"].str.split(",").str[0].str.strip()
 top_genres = merged["main_genre"].value_counts().head(6).index
 df = merged[merged["main_genre"].isin(top_genres)]
@@ -30,6 +27,7 @@ genre_color  = {g: genre_colors[i] for i, g in enumerate(genre_list)}
 
 # GENRE-BASED ANALYSIS
 
+print(""" Das Modell clustert nur anhand von audienceScore und tomatoMeter. Genre ist hier kein Feature des Clustering-Modells. Es wird in Teil 1 nur zur deskriptiven Analyse und in Plot 6 zur Interpretation der Cluster verwendet.""")
 print(" " + "="*55)
 print("PART 1: Genre-based Analysis")
 print("="*55)
@@ -181,7 +179,6 @@ ax.set_yticklabels(sorted_genres, fontsize=12)
 for i in range(len(sorted_genres)):
     for j in range(len(heatmap_labels)):
         val = heatmap_data[i, j]
-        # Text color based on display value
         disp_val = display_data[i, j]
         color = "black" if 25 < disp_val < 75 else "white"
         ax.text(j, i, f"{val:.0f}%",
@@ -244,8 +241,12 @@ for k in k_range:
     db_scores.append(davies_bouldin_score(X_scaled, labels))
     print(f"  k={k}: Silhouette={sil_scores[-1]:.3f}, DB={db_scores[-1]:.3f}")
 
+best_k_auto = list(k_range)[np.argmax(sil_scores)]
 best_k = 4
-print(f"Using k={best_k}")
+print(f"Mathematisch optimales k (Silhouette): {best_k_auto}")
+print(f"Gewähltes k = {best_k} — gleiche Begründung wie auf den Folien: "
+      f"vier inhaltlich klar interpretierbare Rezeptionsklassen "
+      f"(Poorly/Below/Above/Well Received)")
 
 mbk_final = MiniBatchKMeans(n_clusters=best_k, random_state=42,
                              batch_size=10000, n_init=10)
@@ -350,16 +351,10 @@ tom_vals = [df[df["cluster_name"]==c]["tomatoMeter"].mean()
 pos_vals = [100*(df[df["cluster_name"]==c]["scoreSentiment"]=="POSITIVE").mean()
             for c in cluster_order]
 neg_vals = [100 - p for p in pos_vals]
-
 xticklabels = []
 for c in cluster_order:
-    n   = (df["cluster_name"]==c).sum()
-    tom = df[df["cluster_name"]==c]["tomatoMeter"].mean()
-    aud = df[df["cluster_name"]==c]["audienceScore"].mean()
-    pos = 100*(df[df["cluster_name"]==c]["scoreSentiment"]=="POSITIVE").mean()
-    xticklabels.append(
-        f"{c.split(chr(10))[0]}\nn={n:,}\nTomato:{tom:.0f}% | Aud:{aud:.0f}%")
-
+    n = (df["cluster_name"]==c).sum()
+    xticklabels.append(f"{c.split(chr(10))[0]}\n(n={n:,})")
 fig, axes = plt.subplots(1, 3, figsize=(18, 7))
 
 for ax, vals, title, ylabel in zip(
@@ -380,7 +375,7 @@ for ax, vals, title, ylabel in zip(
     ax.set_title(title, fontweight="bold", fontsize=12)
     ax.set_ylim(0, 115)
     ax.set_xticks(range(len(cluster_order)))
-    ax.set_xticklabels(xticklabels, rotation=5, ha="center", fontsize=9)
+    ax.set_xticklabels(xticklabels, rotation=0, ha="center", fontsize=10)
     ax.grid(axis="y", alpha=0.4)
     if "Sentiment" in title:
         ax.axhline(50, color="gray", linestyle="--",
@@ -468,13 +463,24 @@ plt.show()
 
 
 
+def evaluate_k_range(X_scaled, k_range=range(2, 8), sample_size=10000):
+    sil_scores, db_scores = [], []
+    for k in k_range:
+        mbk    = MiniBatchKMeans(n_clusters=k, random_state=42,
+                                  batch_size=10000, n_init=10)
+        labels = mbk.fit_predict(X_scaled)
+        sil_scores.append(silhouette_score(X_scaled, labels, sample_size=sample_size))
+        db_scores.append(davies_bouldin_score(X_scaled, labels))
+        print(f"  k={k}: Silhouette={sil_scores[-1]:.3f}, DB={db_scores[-1]:.3f}")
+    return sil_scores, db_scores
+
 # SUMMARY
 
 print(" " + "="*55)
 print("FULL DATASET CLUSTERING SUMMARY")
 print("="*55)
 
-print(f"PART 1: Genre Analysis ")
+print("PART 1: Genre Analysis ")
 print(f"Total reviews: {len(df):,}")
 for _, row in genre_profiles.iterrows():
     gap       = row["audienceScore"] - row["tomatoMeter"]
@@ -485,7 +491,7 @@ for _, row in genre_profiles.iterrows():
           f"negative={row['negative_pct']:.0f}%, "
           f"gap={gap:+.1f}% ({direction})")
 
-print(f" PART 2: ML Clustering ")
+print(" PART 2: ML Clustering ")
 print(f"Algorithm:      MiniBatchKMeans")
 print(f"Features:       audienceScore, tomatoMeter")
 print(f"Total reviews:  {len(df):,}")
@@ -498,7 +504,7 @@ for cname in cluster_order:
     aud = df[df["cluster_name"]==cname]["audienceScore"].mean()
     pos = 100*(df[df["cluster_name"]==cname]["scoreSentiment"]=="POSITIVE").mean()
     neg = 100 - pos
-    print(f"\n  {cname.split(chr(10))[0]}:")
+    print(f"  {cname.split(chr(10))[0]}:")
     print(f"    n              = {n:,}")
     print(f"    Tomatometer    = {tom:.0f}%")
     print(f"    Audience Score = {aud:.0f}%")

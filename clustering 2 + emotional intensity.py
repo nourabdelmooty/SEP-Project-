@@ -7,13 +7,9 @@ from sklearn.cluster import MiniBatchKMeans
 import warnings
 warnings.filterwarnings('ignore')
 
-import os
-os.chdir('/Users/nourelrahman/PycharmProjects/SEP-Project-')
-
-
-
+merged = pd.read_csv('Dataset/merged_clean.csv')
 emotions = pd.read_csv('Dataset/classification_sample_100k_with_emotions.csv')
-merged   = pd.read_csv('Dataset/merged_clean.csv')
+
 
 merged["main_genre"] = merged["genre"].str.split(",").str[0].str.strip()
 top_genres = merged["main_genre"].value_counts().head(6).index
@@ -45,9 +41,6 @@ genre_color  = {g: genre_colors[i] for i, g in enumerate(genre_list)}
 
 
 
-#  GENRE-BASED EMOTION ANALYSIS
-
-
 print(" " + "="*60)
 print("PART 1: Genre-based Emotion Analysis")
 print("="*60)
@@ -61,14 +54,14 @@ genre_scores  = df.groupby("main_genre").agg(
     n            =("reviewText", "count")
 ).reset_index()
 
-print("\nGenre emotion profiles:")
+print("Genre emotion profiles:")
 print(pd.concat([genre_emotion.round(3),
                  genre_scores.set_index("main_genre")[
                      ["tomatoMeter","positive_pct"]].round(1)], axis=1))
 
 
 #plot 1: Emotion scores per genre
-print("  Plot 1: Emotions per Genre ")
+print(" Plot 1: Emotions per Genre ")
 
 fig, ax = plt.subplots(figsize=(14, 7))
 x       = np.arange(len(genre_list))
@@ -149,7 +142,7 @@ plt.savefig("plot2_dominant_genre_per_emotion.png", dpi=150, bbox_inches="tight"
 plt.show()
 
 
-#olot 3: genres vs emotions + scores
+#plot 3: genres vs emotions + scores
 print(" Plot 3: Genre Heatmap ")
 
 heatmap_cols   = ["tomatoMeter", "audienceScore", "positive_pct",
@@ -157,7 +150,6 @@ heatmap_cols   = ["tomatoMeter", "audienceScore", "positive_pct",
 heatmap_labels = ["Tomatometer", "Audience Score", "% Positive",
                   "Emotional\nIntensity"]
 
-# Emotion scores scaled to 0-100 for consistent colormap
 emotion_scaled = genre_emotion * 100
 score_data     = genre_scores.set_index("main_genre")[heatmap_cols]
 score_data["emotional_intensity"] = score_data["emotional_intensity"] * 100
@@ -208,7 +200,7 @@ print("PART 2: ML Clustering")
 print("="*60)
 
 feature_cols = ["joy", "anger", "sadness", "fear",
-                "disgust", "surprise", "emotional_intensity",
+                "disgust", "surprise", "neutral", "emotional_intensity",
                 "audienceScore", "tomatoMeter"]
 X        = df[feature_cols].values
 scaler   = StandardScaler()
@@ -228,8 +220,10 @@ for k in k_range:
     db_scores.append(davies_bouldin_score(X_scaled, labels))
     print(f"  k={k}: Silhouette={sil_scores[-1]:.3f}, DB={db_scores[-1]:.3f}")
 
-best_k = list(k_range)[np.argmax(sil_scores)]
-print(f" Best k = {best_k} (highest Silhouette)")
+best_k_auto = list(k_range)[np.argmax(sil_scores)]
+best_k = 7
+print(f"Mathematisch optimales k (Silhouette): {best_k_auto}")
+print(f"Gewähltes k = {best_k} " f"inhaltlich besser interpretierbare Cluster")
 
 
 #plot 4: Evaluation metrics
@@ -271,23 +265,24 @@ plt.show()
 
 
 
-print(f"\n--- Training MiniBatchKMeans k={best_k} ---")
+print(" Training MiniBatchKMeans k={best_k} ")
 mbk_final = MiniBatchKMeans(n_clusters=best_k, random_state=42,
                              batch_size=10000, n_init=10)
 df["cluster"] = mbk_final.fit_predict(X_scaled) + 1
-
 cluster_means = df.groupby("cluster")[
-    ["joy","anger","sadness","fear","disgust","surprise",
+    ["joy","anger","sadness","fear","disgust","surprise","neutral",
      "emotional_intensity","audienceScore","tomatoMeter"]].mean()
 cluster_pos = df.groupby("cluster")["scoreSentiment"].apply(
     lambda x: 100*(x=="POSITIVE").mean())
 
-used_emotions    = set()
+emotions_with_neutral = ["joy", "anger", "sadness", "fear",
+                          "disgust", "surprise", "neutral"]
+
 cluster_name_map = {}
 
-for cid in sorted(cluster_means.index,
-                  key=lambda x: -cluster_means.loc[x, "emotional_intensity"]):
-    ranking = cluster_means.loc[cid, emotions_plot].sort_values(ascending=False)
+for cid in cluster_means.index:
+    dom_emotion = cluster_means.loc[cid, emotions_with_neutral].idxmax()
+    dom_val     = cluster_means.loc[cid, emotions_with_neutral].max()
     tom = cluster_means.loc[cid, "tomatoMeter"]
     pos = cluster_pos[cid]
     ei  = cluster_means.loc[cid, "emotional_intensity"]
@@ -297,31 +292,20 @@ for cid in sorted(cluster_means.index,
     intensity = "High" if ei > 0.7 else \
                 "Medium" if ei > 0.4 else "Low"
 
-    assigned = False
-    for emotion in ranking.index:
-        if emotion not in used_emotions:
-            used_emotions.add(emotion)
-            cluster_name_map[cid] = (
-                f"{emotion.capitalize()}\n"
-                f"{reception} | {intensity} Intensity\n"
-                f"Tomato: {tom:.0f}%")
-            assigned = True
-            break
+    cluster_name_map[cid] = (
+        f"{dom_emotion.capitalize()} ({dom_val:.2f})\n"
+        f"{reception} | {intensity} Intensity\n"
+        f"Tomato: {tom:.0f}%")
 
-    if not assigned:
-        top2 = ranking.index[:2]
-        name = f"{top2[0].capitalize()}-{top2[1].capitalize()}"
-        cluster_name_map[cid] = (
-            f"{name}\n"
-            f"{reception} | {intensity} Intensity\n"
-            f"Tomato: {tom:.0f}%")
+    print(f"  Cluster {cid}: dominant={dom_emotion} ({dom_val:.3f}) | "
+          f"tomato={tom:.0f}% | positive={pos:.0f}% | intensity={ei:.3f}")
 
 df["cluster_name"] = df["cluster"].map(cluster_name_map)
 
-print(f"Cluster name check:")
+print("Cluster name check:")
 print(df["cluster_name"].value_counts())
 missing = df["cluster_name"].isnull().sum()
-print(f"Missing names: {missing}")
+print("Missing names: {missing}")
 cluster_order = [cluster_name_map[i]
                  for i in sorted(cluster_name_map.keys(),
                                  key=lambda x: cluster_means.loc[x,"tomatoMeter"])]
@@ -345,8 +329,7 @@ tom_vals = [df[df["cluster_name"]==c]["tomatoMeter"].mean()
 pos_vals = [100*(df[df["cluster_name"]==c]["scoreSentiment"]=="POSITIVE").mean()
             for c in cluster_order]
 
-xticklabels = [f"{c}\nn={(df['cluster_name']==c).sum():,}"
-               for c in cluster_order]
+xticklabels = [c.split("\n")[0] for c in cluster_order]
 
 fig, axes = plt.subplots(1, 3, figsize=(20, 7))
 
@@ -367,7 +350,7 @@ for ax, vals, title, ylabel in zip(
     ax.set_title(title, fontweight="bold", fontsize=11)
     ax.set_ylim(0, 115)
     ax.set_xticks(range(len(cluster_order)))
-    ax.set_xticklabels(xticklabels, rotation=15, ha="right", fontsize=8)
+    ax.set_xticklabels(xticklabels, rotation=20, ha="right", fontsize=10)
     ax.grid(axis="y", alpha=0.4)
     if "Sentiment" in title:
         ax.axhline(50, color="gray", linestyle="--",
@@ -383,7 +366,7 @@ plt.show()
 
 
 # plot 7: Box plots
-print("\n--- Plot 7: Box Plots ---")
+print(" Plot 7: Box Plots ")
 
 data_ei  = [df[df["cluster_name"]==c]["emotional_intensity"].values
             for c in cluster_order]
@@ -445,6 +428,24 @@ plt.savefig("plot7_boxplots.png", dpi=150, bbox_inches="tight")
 plt.show()
 
 
+# mit vs ohne emotional_intensity
+print("Vergleich: Mit vs Ohne emotional_intensity ")
+
+feature_cols_with    = ["joy","anger","sadness","fear","disgust","surprise",
+                        "emotional_intensity","audienceScore","tomatoMeter"]
+feature_cols_without = ["joy","anger","sadness","fear","disgust","surprise",
+                        "audienceScore","tomatoMeter"]
+
+for label, cols in [("mit emotional_intensity", feature_cols_with),
+                     ("ohne emotional_intensity", feature_cols_without)]:
+    X_test = df[cols].values
+    X_test_scaled = StandardScaler().fit_transform(X_test)
+    mbk_test = MiniBatchKMeans(n_clusters=7, random_state=42,
+                               batch_size=10000, n_init=10)
+    labels_test = mbk_test.fit_predict(X_test_scaled)
+    sil_test = silhouette_score(X_test_scaled, labels_test, sample_size=5000)
+    print(f"  {label}: Silhouette = {sil_test:.3f}")
+
 
 # SUMMARY
 
@@ -452,7 +453,7 @@ print(" " + "="*60)
 print("COMPLETE CLUSTERING SUMMARY")
 print("="*60)
 
-print("--- PART 1: Genre-based Emotion Analysis ---")
+print("PART 1: Genre based Emotion Analysis ")
 print(f"Total reviews: {len(df):,}")
 print(f"Top emotion per genre:")
 for g in genre_list:
@@ -462,7 +463,7 @@ for g in genre_list:
     pos = genre_scores[genre_scores["main_genre"]==g]["positive_pct"].values[0]
     print(f"  {g}: dominant={dom} ({val:.3f}) | tomato={tom:.0f}% | positive={pos:.0f}%")
 
-print(f"--- PART 2: ML Clustering ---")
+print(" PART 2: ML Clustering")
 print(f"Algorithm:       MiniBatchKMeans")
 print(f"Features:        {feature_cols}")
 print(f"Best k:          {best_k}")
