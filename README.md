@@ -119,7 +119,7 @@ rotten_tomatoes_movies.csv
 01_data_understanding.ipynb
             │
             ├── reviews_clean.csv
-            └── merged_clean.csv
+            └── merged_clean.csv (nur für EDA)
                     │
                     ▼
 02_classification_emotion_intensity_updated.ipynb
@@ -136,11 +136,32 @@ film_level_clean.csv
             ▼
 Regression und Clustering
 ```
+
+## Datensätze
+
+| Datei                                            | Beschreibung | Erstellt durch |
+|--------------------------------------------------|--------------|----------------|
+| `reviews_clean.csv`                              | Bereinigte englischsprachige Filmrezensionen. Dieser Datensatz dient als Ausgangspunkt für die Klassifikation. | 01_data_understanding |
+| `reviews_with_emotions_and_intensity_classes.csv` | Rezensionen mit berechneten Emotionsscores sowie der finalen Zielvariable (`low`, `medium`, `high`). Dieser Datensatz wird für die Klassifikation erstellt und dient anschließend als Grundlage für die Aggregation auf Filmebene. | 02_classification_emotion_intensity_updated |
+| `film_level_clean.csv`                           | Aggregierter Datensatz auf Filmebene. Die aus den Rezensionen berechneten Emotionsmerkmale werden je Film zusammengefasst und mit den Filminformationen kombiniert. Dieser Datensatz bildet die Grundlage für die Regressions- und Clustering-Analysen. | 03_film_level_updated |
+| `classification_sample_100k_with_emotions.csv`  |  Stichprobe für Experimente während der Entwicklung der Klassifikation.              |   02_classification_emotion_intensity_updated   |
+| `film_level_dataset_full.csv`                    | Aggregierter Filmdatensatz aus einer früheren Projektphase; wird von weiteren Projektteilen verwendet.             |                       |
+| `film_level_dataset_reliable.csv`               |  Bereinigte Variante des aggregierten Filmdatensatzes aus der bisherigen Projektpipeline.            |                       |
+
+
+
+## Hinweise
+* merged_clean.csv dient ausschließlich der explorativen Datenanalyse.
+* Die Klassifikation arbeitet ausschließlich mit reviews_clean.csv.
+* Die Dateien film_level_dataset_full.csv und film_level_dataset_reliable.csv stammen aus einer früheren Projektphase und bleiben aus Gründen der Nachvollziehbarkeit sowie zur Kompatibilität mit bereits entwickelten Notebooks im Repository erhalten. Für die finale Pipeline wird film_level_clean.csv verwendet.
+* Die Regressions- und Clustering-Modelle verwenden den in Notebook 03 erzeugten Datensatz film_level_clean.csv.
+
+
 ## Voraussetzungen
 
 Python 3.13
 
-Benötigte Bibliotheken
+Benötigte Bibliotheken:
 
 * pandas
 * numpy
@@ -151,9 +172,3 @@ Benötigte Bibliotheken
 * langdetect
 * transformers
 * torch
-
-## Hinweise
-
-* merged_clean.csv dient ausschließlich der explorativen Datenanalyse.
-* Die Klassifikation arbeitet ausschließlich mit reviews_clean.csv.
-* Die Regressions- und Clustering-Modelle verwenden den in Notebook 03 erzeugten Datensatz film_level_clean.csv.

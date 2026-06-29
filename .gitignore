@@ -230,12 +230,9 @@ __marimo__/
 .DS_Store
 
 # Dataset
-Dataset/classification_*_with_emotions.csv
 
 Dataset/*
 !Dataset/classification_sample_100k_with_emotions.csv
 !Dataset/film_level_dataset_full.csv
 !Dataset/film_level_dataset_reliable.csv
-
-# Dima's experiment files
-dima_git_ignore/
+!Dataset/film_level_clean.csv
