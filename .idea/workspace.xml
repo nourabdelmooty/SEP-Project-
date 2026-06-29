@@ -4,25 +4,43 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="39b572ce-90f4-493e-b8c5-c46e584deb79" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Dataset/merged_clean.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dataset/reviews_clean.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dataset/rotten_tomatoes_movie_reviews.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dataset/rotten_tomatoes_movies.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/01_data_understanding.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/01_data_understanding.ipynb" afterDir="false" />
+    <list default="true" id="39b572ce-90f4-493e-b8c5-c46e584deb79" name="Changes" comment="Regression">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/02_visualization.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/02_visualization.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dataset/Regression.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Regression_to_push.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/04_regression.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Jupyter Notebook" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4,
-  "fromUser": false
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "lizardloz"
+  }
 }]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/nourabdelmooty/SEP-Project-.git",
+    "accountId": "738c1aa6-bdde-4bf2-988c-2730516ef8a6"
+  }
+}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4,
+  &quot;fromUser&quot;: false
+}</component>
   <component name="ProjectId" id="3Ecm2kMwfX24OfWfLaN5PfCWyCZ" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -35,23 +53,24 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/elizavetalozovskaa/PycharmProjects/SEP-Project-/Dataset",
+    "git-widget-placeholder": "visualizations",
+    "last_opened_file_path": "/Users/elizavetalozovskaa/PycharmProjects/SEP-Project-",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "settings.editor.selected.configurable": "editor.preferences.folding",
     "settings.editor.splitter.proportion": "0.29531568"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/Dataset" />
       <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/Dataset" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/venv" />
       <recent name="$PROJECT_DIR$/Dataset" />
     </key>
   </component>
@@ -70,9 +89,54 @@
       <option name="presentableId" value="Default" />
       <updated>1780486026987</updated>
     </task>
+    <task id="LOCAL-00001" summary="Regression">
+      <option name="closed" value="true" />
+      <created>1782216848913</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1782216848913</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Regression">
+      <option name="closed" value="true" />
+      <created>1782216955301</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1782216955301</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Regression">
+      <option name="closed" value="true" />
+      <created>1782217233262</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1782217233262</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Regression" />
+    <option name="LAST_COMMIT_MESSAGE" value="Regression" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/04_regression.ipynb</url>
+          <line>4</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="jupyter-line">
+          <url>file://$PROJECT_DIR$/04_regression.ipynb</url>
+          <line>551</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
