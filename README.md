@@ -35,6 +35,8 @@ notebooks/
 ├── 01_data_understanding.ipynb
 ├── 02_classification_emotion_intensity_updated.ipynb
 └── 03_film_level_updated.ipynb
+└── 04_regression.ipynb
+└── 05_clustering.ipynb
 ```
 
 ## Beschreibung der Notebooks
@@ -107,6 +109,31 @@ Erzeugte Dateien
 
 * film_level_full.csv
 * film_level_clean.csv
+
+### 04_regression.ipynb
+Aufbau und Evaluation von Regressionsmodellen zur Vorhersage von Filmbewertungen auf Basis von Kritiker-Emotionen und Filmmerkmalen.
+
+Inhalte
+
+*  Laden des aggregierten Film-Datensatzes `film_level_dataset_reliable.csv`
+*  Explorative Analyse der Zielvariable `audienceScore`
+*  Behandlung fehlender Werte
+*  One-Hot-Encoding kategorialer Merkmale
+*  Analyse von Multikollinearität zwischen Emotionsmerkmalen
+* Training und Evaluation von Linearer Regression und Random Forest
+* Vergleich verschiedener Modellversionen mit und ohne `tomatoMeter`
+* Konstruktion der alternativen Zielvariable `meinungsverschiedenheit = audienceScore - tomatoMeter`
+* Ergänzung zusätzlicher Merkmale aus `merged_clean.csv`
+* Wechsel der finalen Zielvariable zu `tomatoMeter`, da die Emotionsdaten aus Kritikerrezensionen stammen
+* Extraktion zusätzlicher Filmmerkmale wie Kasseneinnahmen, Altersfreigabe, Kinostart-Datum und Genre-Informationen
+* Finales Modelltraining zur Vorhersage von `tomatoMeter`
+* Prüfung von Overfitting anhand von Train- und Test-R²
+* Analyse von Koeffizienten und Feature Importance
+
+Verwendete Dateien
+
+* film_level_dataset_reliable.csv (Eingabe)
+* merged_clean.csv (Eingabe, für zusätzliche Merkmale)
 
 ## Verarbeitungsablauf
 ```text
