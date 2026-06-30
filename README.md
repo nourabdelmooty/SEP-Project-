@@ -182,7 +182,7 @@ rotten_tomatoes_movies.csv
 01_data_understanding.ipynb
             │
             ├── reviews_clean.csv
-            └── merged_clean.csv (nur für EDA)
+            └── merged_clean.csv (nur für EDA und Clustering)
                     │
                     ▼
 02_classification_emotion_intensity_updated.ipynb
