@@ -199,8 +199,8 @@ film_level_clean.csv
             ▼
 04_regression.ipynb
            
-05_clustering.ipynb ( verwendet merged_clean.csv und
-classification_sample_100k_with_emotions.csv)
+05_clustering.ipynb ( verwendet für Modell 1: merged_clean.csv und
+für Modell 2: classification_sample_100k_with_emotions.csv + merged_clean.csv)
 ```
 
 ## Datensätze
@@ -218,7 +218,7 @@ classification_sample_100k_with_emotions.csv)
 
 
 ## Hinweise
-* merged_clean.csv dient ausschließlich der explorativen Datenanalyse.
+* merged_clean.csv wird für die explorative Datenanalyse sowie im Clustering-Notebook (Modell 1 und als Grundlage für Modell 2) verwendet.
 * Die Klassifikation arbeitet ausschließlich mit reviews_clean.csv.
 * Die Dateien film_level_dataset_full.csv und film_level_dataset_reliable.csv stammen aus einer früheren Projektphase und bleiben aus Gründen der Nachvollziehbarkeit sowie zur Kompatibilität mit bereits entwickelten Notebooks im Repository erhalten. Für die finale Pipeline wird film_level_clean.csv verwendet.
 * Die Regressionsmodell verwendet den in Notebook 03 erzeugten Datensatz film_level_clean.csv.
