@@ -74,13 +74,12 @@ reviews_clean.csv   merged_clean.csv
 02_classification_          │               (zusätzliche Filmmerkmale)
 emotion_intensity_          │
 updated.ipynb               └──────────────► 05_clustering.ipynb
-      │                                     (Modell 1)
+      │                                     (Modell 1,2)
       ▼
 classification_sample_100k_with_emotions.csv
       │
       ├──────────────► 05_clustering.ipynb
-      │               (Modell 2, zusammen mit
-      │                merged_clean.csv)
+      │               (Modell 2)
       ▼
 03_film_level_updated.ipynb
       │
