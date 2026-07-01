@@ -13,8 +13,7 @@ Der hier dokumentierte Teil des Projekts umfasst
 * die Klassifikation der Emotionsintensität von Rezensionen sowie
 * die Erstellung eines Datensatzes auf Filmebene.
 
-Die anschließend durchgeführten Regressions- und Clustering-Analysen basieren auf dem in Notebook 03 erzeugten Filmdatensatz.
-
+Die anschließend durchgeführte Regressions-Analyse basiert auf dem in Notebook 03 erzeugten Filmdatensatz. Die Clustering-Analyse verwendet separat merged_clean.csv und classification_sample_100k_with_emotions.csv.
 ## Datenquelle
 
 Die verwendeten Datensätze stammen aus Kaggle:
@@ -35,6 +34,8 @@ notebooks/
 ├── 01_data_understanding.ipynb
 ├── 02_classification_emotion_intensity_updated.ipynb
 └── 03_film_level_updated.ipynb
+└── 04_regression.ipynb
+└── 05_clustering.ipynb
 ```
 
 ## Beschreibung der Notebooks
@@ -108,6 +109,68 @@ Erzeugte Dateien
 * film_level_full.csv
 * film_level_clean.csv
 
+### 04_regression.ipynb
+Aufbau und Evaluation von Regressionsmodellen zur Vorhersage von Filmbewertungen auf Basis von Kritiker-Emotionen und Filmmerkmalen.
+
+Inhalte
+
+*  Laden des aggregierten Film-Datensatzes `film_level_dataset_reliable.csv`
+*  Explorative Analyse der Zielvariable `audienceScore`
+*  Behandlung fehlender Werte
+*  One-Hot-Encoding kategorialer Merkmale
+*  Analyse von Multikollinearität zwischen Emotionsmerkmalen
+* Training und Evaluation von Linearer Regression und Random Forest
+* Vergleich verschiedener Modellversionen mit und ohne `tomatoMeter`
+* Konstruktion der alternativen Zielvariable `meinungsverschiedenheit = audienceScore - tomatoMeter`
+* Ergänzung zusätzlicher Merkmale aus `merged_clean.csv`
+* Wechsel der finalen Zielvariable zu `tomatoMeter`, da die Emotionsdaten aus Kritikerrezensionen stammen
+* Extraktion zusätzlicher Filmmerkmale wie Kasseneinnahmen, Altersfreigabe, Kinostart-Datum und Genre-Informationen
+* Finales Modelltraining zur Vorhersage von `tomatoMeter`
+* Prüfung von Overfitting anhand von Train- und Test-R²
+* Analyse von Koeffizienten und Feature Importance
+
+Verwendete Dateien
+
+* film_level_dataset_reliable.csv (Eingabe)
+* merged_clean.csv (Eingabe, für zusätzliche Merkmale)
+
+### 05_clustering.ipynb
+
+Clustering-Analyse der Filmrezensionen anhand von Bewertungsmustern und emotionalen Profilen.
+
+Inhalte
+
+* Deskriptive Genre-Analyse (Kritiker- vs. Publikumsbewertung)
+* ML-Clustering anhand von Bewertungsmustern (Modell 1)
+* Deskriptive Genre-Emotionsanalyse
+* ML-Clustering anhand von Emotionsprofilen (Modell 2)
+* Evaluation beider Modelle mit Silhouette Score und Davies-Bouldin Score
+* Vergleichstest mit und ohne emotional_intensity als Feature
+
+Verwendete Dateien
+
+* merged_clean.csv (Eingabe, Modell 1)
+* classification_sample_100k_with_emotions.csv (Eingabe, Modell 2, gemergt mit merged_clean.csv)
+
+Erzeugte Dateien
+
+Modell 1 — Rezeptionsbasiertes Clustering
+
+* plot1_scores_per_genre.png
+* plot2_positive_negative.png
+* plot3_genre_heatmap.png
+* plot4_evaluation.png
+* plot5_cluster_profiles.png
+* plot6_scatter_comparison.png
+
+Modell 2 — Emotionsbasiertes Clustering
+
+* plot1_emotions_per_genre.png
+* plot2_dominant_genre_per_emotion.png
+* plot3_genre_heatmap.png
+* plot4_evaluation_metrics.png
+* plot5_cluster_profiles.png
+* plot6_boxplots.png
 ## Verarbeitungsablauf
 ```text
 Kaggle
@@ -119,7 +182,7 @@ rotten_tomatoes_movies.csv
 01_data_understanding.ipynb
             │
             ├── reviews_clean.csv
-            └── merged_clean.csv (nur für EDA)
+            └── merged_clean.csv (nur für EDA und Clustering)
                     │
                     ▼
 02_classification_emotion_intensity_updated.ipynb
@@ -134,28 +197,32 @@ reviews_with_emotions_and_intensity_classes.csv
 film_level_clean.csv
             │
             ▼
-Regression und Clustering
+04_regression.ipynb
+           
+05_clustering.ipynb ( verwendet für Modell 1: merged_clean.csv und
+für Modell 2: classification_sample_100k_with_emotions.csv + merged_clean.csv)
 ```
 
 ## Datensätze
 
-| Datei                                            | Beschreibung | Erstellt durch |
-|--------------------------------------------------|--------------|----------------|
-| `reviews_clean.csv`                              | Bereinigte englischsprachige Filmrezensionen. Dieser Datensatz dient als Ausgangspunkt für die Klassifikation. | 01_data_understanding |
+| Datei                                             | Beschreibung | Erstellt durch |
+|---------------------------------------------------|--------------|----------------|
+| `reviews_clean.csv`                               | Bereinigte englischsprachige Filmrezensionen. Dieser Datensatz dient als Ausgangspunkt für die Klassifikation. | 01_data_understanding |
 | `reviews_with_emotions_and_intensity_classes.csv` | Rezensionen mit berechneten Emotionsscores sowie der finalen Zielvariable (`low`, `medium`, `high`). Dieser Datensatz wird für die Klassifikation erstellt und dient anschließend als Grundlage für die Aggregation auf Filmebene. | 02_classification_emotion_intensity_updated |
-| `film_level_clean.csv`                           | Aggregierter Datensatz auf Filmebene. Die aus den Rezensionen berechneten Emotionsmerkmale werden je Film zusammengefasst und mit den Filminformationen kombiniert. Dieser Datensatz bildet die Grundlage für die Regressions- und Clustering-Analysen. | 03_film_level_updated |
-| `classification_sample_100k_with_emotions.csv`  |  Stichprobe für Experimente während der Entwicklung der Klassifikation.              |   02_classification_emotion_intensity_updated   |
-| `film_level_dataset_full.csv`                    | Aggregierter Filmdatensatz aus einer früheren Projektphase; wird von weiteren Projektteilen verwendet.             |                       |
-| `film_level_dataset_reliable.csv`               |  Bereinigte Variante des aggregierten Filmdatensatzes aus der bisherigen Projektpipeline.            |                       |
+| `film_level_clean.csv`                            | Aggregierter Datensatz auf Filmebene. Die aus den Rezensionen berechneten Emotionsmerkmale werden je Film zusammengefasst und mit den Filminformationen kombiniert. Dieser Datensatz bildet die Grundlage für die Regressions- und Clustering-Analysen. | 03_film_level_updated |
+| `classification_sample_100k_with_emotions.csv`    |  Stichprobe für Experimente während der Entwicklung der Klassifikation.              |   02_classification_emotion_intensity_updated   |
+| `film_level_dataset_full.csv`                     | Aggregierter Filmdatensatz aus einer früheren Projektphase; wird von weiteren Projektteilen verwendet.             |                       |
+| `film_level_dataset_reliable.csv`                 |  Bereinigte Variante des aggregierten Filmdatensatzes aus der bisherigen Projektpipeline.            |                       |
+| `merged_clean.csv` (gefiltert)                    | Wird zusätzlich im Clustering-Notebook verwendet — auf die sechs häufigsten Genres reduziert (Comedy, Drama, Documentary, Mystery & Thriller, Action, Horror). | 01_data_understanding, weiterverarbeitet in 05_clustering |
 
 
 
 ## Hinweise
-* merged_clean.csv dient ausschließlich der explorativen Datenanalyse.
+* merged_clean.csv wird für die explorative Datenanalyse sowie im Clustering-Notebook (Modell 1 und als Grundlage für Modell 2) verwendet.
 * Die Klassifikation arbeitet ausschließlich mit reviews_clean.csv.
 * Die Dateien film_level_dataset_full.csv und film_level_dataset_reliable.csv stammen aus einer früheren Projektphase und bleiben aus Gründen der Nachvollziehbarkeit sowie zur Kompatibilität mit bereits entwickelten Notebooks im Repository erhalten. Für die finale Pipeline wird film_level_clean.csv verwendet.
-* Die Regressions- und Clustering-Modelle verwenden den in Notebook 03 erzeugten Datensatz film_level_clean.csv.
-
+* Die Regressionsmodell verwendet den in Notebook 03 erzeugten Datensatz film_level_clean.csv.
+* Das Clustering-Notebook arbeitet abweichend von Regression und Klassifikation auf Review-Ebene statt Film-Ebene und verwendet daher `merged_clean.csv` sowie `classification_sample_100k_with_emotions.csv` direkt anstelle von `film_level_clean.csv`. Modell 1 nutzt ausschließlich Bewertungswerte (audienceScore, tomatoMeter). Genre dient nur der nachträglichen Interpretation. Modell 2 ergänzt zusätzlich Emotionsmerkmale.
 
 ## Voraussetzungen
 
