@@ -4,70 +4,120 @@ anhand emotionaler Profile
 
 
 ## Projektübersicht
+Dieses Projekt untersucht Filmrezensionen von Rotten Tomatoes mithilfe von Methoden des Machine Learnings.
 
-Dieses Projekt untersucht Filmkritiken aus Rotten Tomatoes mithilfe von Methoden des Machine Learnings.
+Ziel ist es, emotionale Informationen aus Rezensionen zu extrahieren und diese für verschiedene Analyseaufgaben auf Review- und Filmebene zu nutzen.
 
-Der hier dokumentierte Teil des Projekts umfasst
+Die Analysen bauen inhaltlich aufeinander auf:
 
-* die Datenaufbereitung,
-* die Klassifikation der Emotionsintensität von Rezensionen sowie
-* die Erstellung eines Datensatzes auf Filmebene.
-* die Regression basiert auf `film_level_clean.csv`. 
-* die Clustering-Analyse nutzt ergänzend `merged_clean.csv` und `classification_sample_100k_with_emotions.csv`, da dort zusätzlich Review-Level-Muster untersucht werden.
+1. **Datenaufbereitung** – Bereinigung und Vorbereitung der Rohdaten.
+2. **Klassifikation** – Vorhersage der emotionalen Intensität einzelner Rezensionen.
+3. **Aggregation** – Zusammenführung der Emotionen auf Filmebene.
+4. **Regression** – Vorhersage des TomatoMeter eines Films anhand aggregierter Emotionen und weiterer Filmmerkmale.
+5. **Clustering** – Identifikation ähnlicher Bewertungs- und Emotionsprofile.
 
-## Datenquelle
+Weitere Informationen zu den einzelnen Schritten, den verwendeten Datensätzen und der Datenpipeline finden sich in den folgenden Abschnitten.
 
-Die verwendeten Datensätze stammen aus Kaggle:
+## Repository-Struktur
 
+```text
+SEP-Project/
+│
+├── Dataset/
+│   ├── film_level_clean.csv
+│   └── classification_sample_100k_with_emotions.csv
+│
+├── notebooks/
+│   ├── 01_data_understanding.ipynb
+│   ├── 02_classification_emotion_intensity_updated.ipynb
+│   ├── 03_film_level_updated.ipynb
+│   ├── 04_regression.ipynb
+│   └── 05_clustering.ipynb
+│
+├── README.md
+└── LICENSE
+```
+
+## Datenquellen
+### Rotten Tomatoes
+
+Kaggle:
 **Clapper – Massive Rotten Tomatoes Movies and Reviews**
 
 https://www.kaggle.com/datasets/andrezaza/clapper-massive-rotten-tomatoes-movies-and-reviews
 
-Verwendete Dateien:
-
+Verwendete Rohdaten:
 * rotten_tomatoes_movie_reviews.csv
 * rotten_tomatoes_movies.csv
 
-## Projektstruktur
+### Emotionsmodell (Emotionserkennung)
 
+Hugging-Face-Modell:
+* j-hartmann/emotion-english-distilroberta-base
+
+## Datenpipeline
 ```text
-notebooks/
-├── 01_data_understanding.ipynb
-├── 02_classification_emotion_intensity_updated.ipynb
-├── 03_film_level_updated.ipynb
-├── 04_regression.ipynb
-└── 05_clustering.ipynb
+Kaggle
+
+rotten_tomatoes_movie_reviews.csv
+rotten_tomatoes_movies.csv
+                │
+                ▼
+      01_data_understanding.ipynb
+                │
+      ┌─────────┴─────────┐
+      ▼                   ▼
+reviews_clean.csv   merged_clean.csv
++ Emotionsmodell            │  
+      │                     │
+      ▼                     ├──────────────► 04_regression.ipynb
+02_classification_          │               (zusätzliche Filmmerkmale)
+emotion_intensity_          │
+updated.ipynb               └──────────────► 05_clustering.ipynb
+      │                                     (Modell 1)
+      ▼
+classification_sample_100k_with_emotions.csv
+      │
+      ├──────────────► 05_clustering.ipynb
+      │               (Modell 2, zusammen mit
+      │                merged_clean.csv)
+      ▼
+03_film_level_updated.ipynb
+      │
+      ▼
+film_level_clean.csv
+      │
+      ▼
+04_regression.ipynb
+(Hauptdatensatz)
 ```
-## Verfügbare Dateien und Reproduzierbarkeit
 
-### Bereits im Repository enthalten
+## Verfügbare und nicht enthaltene Datensätze
 
-Für die Bewertung des Projekts sind alle finalen Datensätze und Notebooks bereits im Repository enthalten. Die Analysen können daher ohne erneute Ausführung der vollständigen Datenpipeline nachvollzogen werden.
+### Im Repository enthalten
 
-Bereitgestellt werden insbesondere:
+Die folgenden Datensätze werden im Repository gespeichert:
 
-- `classification_sample_100k_with_emotions.csv`
-- `film_level_clean.csv`
+| Datei | Verwendung |
+|--------|------------|
+| film_level_clean.csv | Eingabe für die Regression |
+| classification_sample_100k_with_emotions.csv | Eingabe für das emotionsbasierte Clustering (Modell 2) |
 
-sowie alle fünf finalen Notebooks.
+### Nicht im Repository enthalten
 
-### Externe Quelldaten
+Die folgenden Dateien werden **nicht** im Repository gespeichert:
 
-Die ursprünglichen Rohdaten stammen aus dem Kaggle-Datensatz
+| Datei | Grund                                         |
+|--------|-----------------------------------------------|
+| rotten_tomatoes_movie_reviews.csv | ursprünglicher Kaggle-Datensatz  |
+| rotten_tomatoes_movies.csv | ursprünglicher Kaggle-Datensatz   |
+| reviews_clean.csv | automatisch in Notebook 01 erzeugt  (Dateigröße) |
+| merged_clean.csv | automatisch in Notebook 01 erzeugt  (Dateigröße) |
+| reviews_with_emotions_and_intensity_classes.csv | automatisch in Notebook 02 erzeugt  (Dateigröße) |
 
-**Clapper – Massive Rotten Tomatoes Movies and Reviews**
+Die ursprünglichen Kaggle-Datensätze können jederzeit über den oben angegebenen Link heruntergeladen werden.
 
-und sind aufgrund ihrer Größe nicht Bestandteil dieses Repositories.
-
-### Automatisch erzeugte Zwischendatensätze
-
-Beim Ausführen der Pipeline werden zusätzlich folgende Zwischendatensätze erzeugt:
-
-- `reviews_clean.csv`
-- `merged_clean.csv`
-- `reviews_with_emotions_and_intensity_classes.csv`
-
-Diese Dateien dienen als Zwischenergebnisse der Verarbeitung und können durch Ausführen der Notebooks jederzeit neu erzeugt werden.
+Die automatisch erzeugten Zwischendatensätze werden beim erneuten Ausführen der Pipeline erstellt und müssen daher nicht im Repository gespeichert werden.
 
 ## Beschreibung der Notebooks
 
@@ -89,7 +139,7 @@ Untersuchung und Bereinigung der ursprünglichen Rotten-Tomatoes-Daten.
 **Erzeugte Dateien**:
 
 * reviews_clean.csv
-* merged_clean.csv (nur für die explorative Datenanalyse)
+* merged_clean.csv
 
 ### 02_classification_emotion_intensity_updated.ipynb
 
@@ -109,21 +159,12 @@ Klassifikation der Emotionsintensität von Filmkritiken.
 
 Zwischenergebnisse:
 
-* classification_sample_50k_with_emotions.csv
-* classification_sample_100k_with_emotions.csv
-* classification_sample_500k_with_emotions.csv
-* classification_full_with_emotions.csv
-
-Vorhersagen:
-
-* classification_predictions_50k.csv
-* classification_predictions_100k.csv
-* classification_predictions_500k.csv
-* classification_predictions_full.csv
+* verschiedene Datensätze mit berechneten Emotionsscores und Vorhersagen
 
 Finaler Datensatz:
 
 * reviews_with_emotions_and_intensity_classes.csv
+* classification_sample_100k_with_emotions.csv
 
 ### 03_film_level_updated.ipynb
 
@@ -201,60 +242,7 @@ Modell 2 — Emotionsbasiertes Clustering
 * plot4_evaluation_metrics.png
 * plot5_cluster_profiles.png
 * plot6_boxplots.png
-## Verarbeitungsablauf
-```text
-Kaggle
 
-rotten_tomatoes_movie_reviews.csv
-rotten_tomatoes_movies.csv
-                │
-                ▼
-      01_data_understanding.ipynb
-                │
-      ┌─────────┴─────────┐
-      ▼                   ▼
-reviews_clean.csv   merged_clean.csv
-      │                     │
-      ▼                     ├──────────────► 04_regression.ipynb
-02_classification_          │               (zusätzliche Filmmerkmale)
-emotion_intensity_          │
-updated.ipynb               └──────────────► 05_clustering.ipynb
-      │                                     (Modell 1)
-      ▼
-classification_sample_100k_with_emotions.csv
-      │
-      ├──────────────► 05_clustering.ipynb
-      │               (Modell 2, zusammen mit
-      │                merged_clean.csv)
-      ▼
-03_film_level_updated.ipynb
-      │
-      ▼
-film_level_clean.csv
-      │
-      ▼
-04_regression.ipynb
-(Hauptdatensatz)
-```
-
-## Datensätze
-
-| Datei                                             | Beschreibung | Erstellt durch |
-|---------------------------------------------------|--------------|----------------|
-| `reviews_clean.csv`                               | Bereinigte englischsprachige Filmrezensionen. Dieser Datensatz dient als Ausgangspunkt für die Klassifikation. | 01_data_understanding |
-| `reviews_with_emotions_and_intensity_classes.csv` | Rezensionen mit berechneten Emotionsscores sowie der finalen Zielvariable (`low`, `medium`, `high`). Dieser Datensatz wird für die Klassifikation erstellt und dient anschließend als Grundlage für die Aggregation auf Filmebene. | 02_classification_emotion_intensity_updated |
-| `film_level_clean.csv`                            | Aggregierter Datensatz auf Filmebene. Die aus den Rezensionen berechneten Emotionsmerkmale werden je Film zusammengefasst und mit den Filminformationen kombiniert. Dieser Datensatz bildet die Grundlage für die Regressions- und Clustering-Analysen. | 03_film_level_updated |
-| `classification_sample_100k_with_emotions.csv`    |  Stichprobe für Experimente während der Entwicklung der Klassifikation.              |   02_classification_emotion_intensity_updated   |
-| `merged_clean.csv` (gefiltert)                    | Wird zusätzlich im Clustering-Notebook verwendet — auf die sechs häufigsten Genres reduziert (Comedy, Drama, Documentary, Mystery & Thriller, Action, Horror). | 01_data_understanding, weiterverarbeitet in 05_clustering |
-
-
-
-## Hinweise
-
-* Die Klassifikation arbeitet ausschließlich mit `reviews_clean.csv`.
-* Das Regressionsmodell verwendet den finalen Film-Level-Datensatz film_level_clean.csv. Zusätzliche Filmmerkmale (rating, ratingContents, boxOffice, releaseDateTheaters) werden aus merged_clean.csv ergänzt. 
-* Das Clustering untersucht zusätzlich Review-Level-Muster und verwendet dafür `merged_clean.csv` sowie `classification_sample_100k_with_emotions.csv`.
-* Die ursprünglichen Kaggle-Rohdaten sind wegen ihrer Größe nicht im Repository enthalten.
 
 ## Voraussetzungen
 
